@@ -1,4 +1,3 @@
-import { NavigationBarSection } from "@/components/Navbar";
 
 export default function RootLayout({
   children,
@@ -8,7 +7,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <NavigationBarSection />
+
         {children}
       </body>
     </html>
