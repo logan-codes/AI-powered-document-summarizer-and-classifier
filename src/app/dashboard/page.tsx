@@ -1,91 +1,10 @@
 import React from "react";
+import SideNavBar from "@/components/SideNavBar";
 
 export default function Frame(){
   return (
-    <div className="relative w-[1440px] h-[961px]">
-      <div className="flex flex-col w-80 h-[959px] items-start justify-between p-4 absolute top-0 left-0 bg-[#f7f9fc]">
-        <div className="flex-col items-start gap-4 self-stretch flex-[0_0_auto] flex relative w-full">
-          <div className="flex items-start gap-2 self-stretch w-full flex-col relative flex-[0_0_auto]">
-            <div className="flex w-72 items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative flex-1 w-6 grow">
-                  
-                </div>
-              </div>
-
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Home
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-72 items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative flex-1 w-6 grow">
-                  
-                </div>
-              </div>
-
-              <input
-                className="inline-flex flex-col items-start relative flex-[0_0_auto] border-[none] [background:none] self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap p-0"
-                placeholder="Search"
-                type="text"
-              />
-            </div>
-
-            <div className="flex w-72 items-center gap-3 px-3 py-2 relative flex-[0_0_auto] bg-[#e8edf2] rounded-lg">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative flex-1 w-6 grow">
-                  
-                </div>
-              </div>
-
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Workspace
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-72 items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative flex-1 w-6 grow">
-                  
-                </div>
-              </div>
-
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Template
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-72 items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative flex-1 w-6 grow">
-                  
-                </div>
-              </div>
-
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Settings
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="min-w-[84px] max-w-[480px] h-10 items-center justify-center px-4 py-0 bg-[#197fe5] rounded-lg overflow-hidden flex relative w-full">
-          <div className="inline-flex items-center flex-col relative flex-[0_0_auto]">
-            <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Bold',Helvetica] font-bold text-[#f7f9fc] text-sm text-center tracking-[0] leading-[21px] whitespace-nowrap overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-              New Case
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="relative w-[1440px] h-screen">
+      <SideNavBar/>
 
       <div className="flex flex-col w-[1078px] h-[693px] items-start absolute top-0 left-80">
         <div className="flex-wrap items-start justify-between gap-[12px_12px] flex-[0_0_auto] flex p-4 relative self-stretch w-full">
@@ -201,7 +120,7 @@ export default function Frame(){
 
           <div className="flex items-start gap-3 relative self-stretch w-full flex-[0_0_auto] mb-[-3.00px]">
             <div className="flex flex-col w-[166px] h-[290px] items-center gap-3 pt-0 pb-3 px-0 relative">
-              <div className="relative self-stretch w-full h-[221px] rounded-lg bg-[url(/depth-7-frame-0-5.png)] bg-cover bg-[50%_50%]" />
+              <div className="relative self-stretch w-full h-[221px] rounded-lg bg-cover bg-[50%_50%]" />
 
               <div className="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">
                 <div className="flex flex-col items-start relative self-stretch w-full flex-[0_0_auto]">

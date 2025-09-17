@@ -49,28 +49,9 @@ const footerLinks = [
 
 export default function Landing(){
   return (
-    <div className="flex flex-col h-[1024px] items-center justify-between relative bg-white overflow-x-hidden">
-      <header className="flex w-[1442px] h-[66.5px] items-center justify-between px-10 py-3 relative mt-[-0.21px] ml-[-1.02px] mr-[-0.98px] bg-white border-t [border-top-style:solid] border-[#e5e8ea]">
-        <div className="inline-flex items-center gap-4 relative flex-[0_0_auto]">
-          
+    <div className="flex flex-col  items-center justify-between relative bg-white">
 
-          <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-            <h1 className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Bold',Helvetica] font-bold text-[#0c141c] text-lg tracking-[0] leading-[23px] whitespace-nowrap">
-              Legal AI
-            </h1>
-          </div>
-        </div>
-
-        <nav
-          className="relative w-[1257px]"
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          
-        </nav>
-      </header>
-
-      <main className="w-[1280px] items-center justify-center flex-[0_0_auto] flex flex-col relative">
+      <main className=" items-center justify-center flex-[0_0_auto] flex flex-col relative">
         <section className="w-[1016px] flex-[0_0_auto] flex flex-col items-start relative">
           <div className="p-4 flex-1 grow flex flex-col items-start relative self-stretch w-full">
             <div className="relative self-stretch w-full h-[480px] rounded-lg overflow-hidden bg-[linear-gradient(90deg,rgba(0,0,0,0.1)_0%,rgba(0,0,0,0.4)_100%)]">
@@ -181,7 +162,7 @@ export default function Landing(){
 
               <div className="flex flex-col items-center relative self-stretch w-full flex-[0_0_auto]">
                 <p className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Regular',Helvetica] font-normal text-[#4f7296] text-base text-center tracking-[0] leading-6">
-                  © 2024 Legal AI. All rights reserved.
+                  © 2025 Legal AI. All rights reserved.
                 </p>
               </div>
             </div>
