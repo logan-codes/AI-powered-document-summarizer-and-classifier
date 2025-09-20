@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function SideNavBar() {
   return (
-    <div className="flex flex-col w-60 h-full items-start justify-between p-4 absolute top-0 left-0 bg-[#f7f9fc]">
+    <div className="flex flex-col w-60 h-screen items-start justify-between p-4 absolute top-0 left-0 bg-[#f7f9fc]">
         <div className="flex-col items-start gap-4 self-stretch flex-[0_0_auto] flex relative w-full">
           <div className="flex items-start gap-2 self-stretch w-full flex-col relative flex-[0_0_auto]">
             <div className="flex w-full items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">

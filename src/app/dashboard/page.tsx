@@ -6,7 +6,7 @@ export default function Frame(){
     <div className="relative w-[1440px] h-screen">
       <SideNavBar/>
 
-      <div className="flex flex-col w-[1078px] h-[693px] items-start absolute top-0 left-80">
+      <div className="flex flex-col w-[1078px] h-screen items-start absolute top-0 left-80">
         <div className="flex-wrap items-start justify-between gap-[12px_12px] flex-[0_0_auto] flex p-4 relative self-stretch w-full">
           <div className="inline-flex flex-col min-w-72 items-start relative flex-[0_0_auto]">
             <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Bold',Helvetica] font-bold text-[#0c141c] text-[32px] tracking-[0] leading-10">
