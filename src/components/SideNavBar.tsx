@@ -1,59 +1,105 @@
-import React from 'react'
+"use client";
 
-export default function SideNavBar() {
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Home, Search, FileText, Settings, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import client from "@/lib/supabase";
+
+interface NavItem {
+  label: string;
+  icon: React.ReactNode;
+  path?: string;
+}
+
+interface SideNavBarProps {
+  expanded: boolean;
+  setExpanded: (val: boolean) => void;
+  uuid: string; // ✅ pass uuid here
+}
+
+export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarProps) {
+  const router = useRouter();
+
+  const navItems: NavItem[] = [
+    { label: "Home", icon: <Home size={20} />, path: `/${uuid}` },
+    { label: "Search", icon: <Search size={20} />, path: `/${uuid}/search` },
+    { label: "Template", icon: <FileText size={20} />, path: `/${uuid}/templates` },
+    { label: "Settings", icon: <Settings size={20} />, path: `/${uuid}/settings` },
+  ];
+
+  const handleNewDraft = async () => {
+    const {
+      data: { user },
+      error: authError,
+    } = await client.auth.getUser();
+
+    if (authError || !user) {
+      router.push("/login");
+      return;
+    }
+
+    const { data, error } = await client
+      .from("drafts")
+      .insert({
+        user_id: user.id,
+        title: "Untitled Document",
+        content: "",
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Failed to create draft:", error.message);
+      return;
+    }
+
+    router.push(`/${uuid}/draft/${data.id}`);
+  };
+
   return (
-    <div className="flex flex-col w-60 h-screen items-start justify-between p-4 absolute top-0 left-0 bg-[#f7f9fc]">
-        <div className="flex-col items-start gap-4 self-stretch flex-[0_0_auto] flex relative w-full">
-          <div className="flex items-start gap-2 self-stretch w-full flex-col relative flex-[0_0_auto]">
-            <div className="flex w-full items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto]">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Legal AI
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-full items-center gap-3 px-3 py-2 relative flex-[0_0_auto] rounded-lg">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto] mx-auto">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Search
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-full items-center gap-3 px-3 py-2 relative flex-[0_0_auto] bg-[#e8edf2] rounded-lg">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto] mx-auto">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Workspace
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-full items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto] mx-auto">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Template
-                </div>
-              </div>
-            </div>
-
-            <div className="flex w-full items-center gap-3 px-3 py-2 relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-start relative flex-[0_0_auto] mx-auto">
-                <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-sm tracking-[0] leading-[21px] whitespace-nowrap">
-                  Settings
-                </div>
-              </div>
-            </div>
+    <div
+      className="fixed left-0 flex flex-col justify-between bg-[#f7f9fc] border-r transition-all duration-300 group z-40"
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+      style={{
+        top: "64px",
+        height: "calc(100vh - 64px)",
+        width: expanded ? "240px" : "64px",
+      }}
+    >
+      {/* Top Section */}
+      <div className="flex flex-col mt-4 space-y-1">
+        {navItems.map((item, index) => (
+          <div
+            key={index}
+            onClick={() => item.path && router.push(item.path)}
+            className={`flex items-center cursor-pointer gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
+              expanded ? "justify-start" : "justify-center"
+            }`}
+          >
+            <span className="text-gray-700">{item.icon}</span>
+            {expanded && (
+              <span className="text-sm font-medium text-[#0c141c]">
+                {item.label}
+              </span>
+            )}
           </div>
-        </div>
-
-        <div className="min-w-[84px] max-w-[480px] h-10 items-center justify-center px-4 py-0 bg-[#197fe5] rounded-lg overflow-hidden flex relative w-full">
-          <div className="inline-flex items-center flex-col relative flex-[0_0_auto]">
-            <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Bold',Helvetica] font-bold text-[#f7f9fc] text-sm text-center tracking-[0] leading-[21px] whitespace-nowrap overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-              New Case
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
-  )
+
+      {/* Bottom Section */}
+      <div className="flex flex-col gap-3 p-4">
+        <Button
+          onClick={handleNewDraft}
+          className={`bg-[#197fe5] hover:bg-blue-700 text-white w-full justify-center ${
+            !expanded ? "px-0" : ""
+          }`}
+        >
+          <Plus size={18} className={!expanded ? "" : "mr-2"} />
+          {expanded && "New Case"}
+        </Button>
+      </div>
+    </div>
+  );
 }

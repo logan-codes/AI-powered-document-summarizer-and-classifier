@@ -1,94 +1,144 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
+import { signUpUser } from "@/lib/auth";
+import { toast } from "sonner"; // ✅ import Sonner
+import Link from "next/link";
 
-export default function SignUp(){
+export default function SignUp() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSignUp = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error("Please fill all fields.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    try {
+      await signUpUser(email, password, name);
+      toast.success("Signup successful! Check your email for confirmation.");
+
+      // Reset fields
+      setName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        toast.error(err.message);
+      } else {
+        toast.error("Signup failed.");
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-[1024px] items-center relative bg-white">
-      
       <div className="flex flex-col max-w-[960px] w-[960px] h-[705px] items-center justify-center px-0 py-5 relative">
-        <div className="relative self-stretch [font-family:'Inter-Bold',Helvetica] font-bold text-[#0c141c] text-[28px] text-center tracking-[0] leading-[35px]">
+
+        <div className="relative self-stretch font-bold text-[#0c141c] text-[28px] text-center leading-[35px]">
           Sign up
         </div>
 
-        <div className="relative self-stretch w-full h-28">
-          <div className="flex-col w-[935px] items-start top-3 left-3 flex relative">
-            <div className="flex w-[691px] items-start pt-0 pb-2 px-0 flex-[0_0_auto] flex-col relative">
-              <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-base tracking-[0] leading-6">
+        {/* Name */}
+        <div className="relative self-stretch w-full h-28 mt-5">
+          <div className="flex-col w-[935px] items-start flex relative">
+            <div className="flex w-[691px] items-start pt-0 pb-2 flex-col relative">
+              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
                 Name*
               </div>
             </div>
-
-            <div className="h-14 items-center p-4 bg-[#e8edf2] rounded-lg overflow-hidden flex relative self-stretch w-full">
-              <div className="relative w-fit mt-[-1.00px] [font-family:'Inter-Regular',Helvetica] font-normal text-[#757575] text-base tracking-[0] leading-6 whitespace-nowrap">
-                Enter&nbsp;&nbsp;your full name
-              </div>
-            </div>
+            <input
+              type="text"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
+            />
           </div>
         </div>
 
-        <div className="relative self-stretch w-full flex-[0_0_auto]">
-          <div className="flex-col w-[938px] h-[88px] items-center justify-between top-1.5 left-3 flex relative">
-            <div className="flex-col items-start pt-0 pb-2 px-0 flex-[0_0_auto] flex relative self-stretch w-full">
-              <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-base tracking-[0] leading-6">
+        {/* Email */}
+        <div className="relative self-stretch w-full mt-3">
+          <div className="flex-col w-[938px] h-[88px] items-center flex relative">
+            <div className="flex-col items-start pt-0 pb-2 flex-col relative w-full">
+              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
                 Email id*
               </div>
             </div>
-
-            <div className="h-14 items-center p-4 bg-[#e8edf2] rounded-lg overflow-hidden flex relative self-stretch w-full">
-              <div className="relative w-fit mt-[-1.00px] [font-family:'Inter-Regular',Helvetica] font-normal text-[#757575] text-base tracking-[0] leading-6 whitespace-nowrap">
-                Enter&nbsp;&nbsp;your&nbsp;&nbsp;email&nbsp;&nbsp;id
-              </div>
-            </div>
+            <input
+              type="email"
+              placeholder="Enter your email id"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
+            />
           </div>
         </div>
 
-        <div className="flex flex-wrap items-start justify-around gap-[16px_16px] px-4 py-3 relative self-stretch w-full flex-[0_0_auto]">
-          <div className="flex-col min-w-40 items-start flex-1 grow flex relative">
-            <div className="flex-col items-start pt-0 pb-2 px-0 flex-[0_0_auto] flex relative self-stretch w-full">
-              <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-base tracking-[0] leading-6">
+        {/* Password */}
+        <div className="flex flex-wrap items-start justify-around gap-4 px-4 py-3 w-full mt-3">
+          <div className="flex-col min-w-40 items-start flex-1 flex relative">
+            <div className="flex-col items-start pt-0 pb-2 flex-col relative w-full">
+              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
                 Password*
               </div>
             </div>
-
-            <div className="h-14 items-center p-4 bg-[#e8edf2] rounded-lg overflow-hidden flex relative self-stretch w-full">
-              <div className="relative w-fit mt-[-1.00px] [font-family:'Inter-Regular',Helvetica] font-normal text-[#757575] text-base tracking-[0] leading-6 whitespace-nowrap">
-                Enter&nbsp;&nbsp;your&nbsp;&nbsp;password
-              </div>
-            </div>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
+            />
           </div>
         </div>
 
-        <div className="flex flex-wrap w-[960px] items-end gap-[16px_16px] px-4 py-3 relative flex-[0_0_auto]">
-          <div className="flex-col min-w-40 items-start flex-1 grow flex relative">
-            <div className="flex-col items-start pt-0 pb-2 px-0 flex-[0_0_auto] flex relative self-stretch w-full">
-              <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Medium',Helvetica] font-medium text-[#0c141c] text-base tracking-[0] leading-6">
+        {/* Confirm Password */}
+        <div className="flex flex-wrap w-full items-end gap-4 px-4 py-3 mt-3">
+          <div className="flex-col min-w-40 items-start flex-1 flex relative">
+            <div className="flex-col items-start pt-0 pb-2 flex-col relative w-full">
+              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
                 Confirm password*
               </div>
             </div>
-
-            <div className="h-14 items-center p-4 bg-[#e8edf2] rounded-lg overflow-hidden flex relative self-stretch w-full">
-              <div className="relative w-fit mt-[-1.00px] [font-family:'Inter-Regular',Helvetica] font-normal text-[#757575] text-base tracking-[0] leading-6 whitespace-nowrap">
-                Confirm&nbsp;&nbsp;your&nbsp;&nbsp;password
-              </div>
-            </div>
+            <input
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
+            />
           </div>
         </div>
 
-        <div className="flex h-[93px] items-center justify-center px-4 py-3 relative self-stretch w-full">
-          <div className="max-w-[480px] w-[463px] h-10 items-center justify-center px-4 py-0 bg-black rounded-lg overflow-hidden flex relative">
-            <div className="flex w-[104px] items-center flex-col relative">
-              <div className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Bold',Helvetica] font-bold text-[#f7f9fc] text-sm text-center tracking-[0] leading-[21px] overflow-hidden text-ellipsis [display:-webkit-box] [-webkit-line-clamp:1] [-webkit-box-orient:vertical]">
-                Sign up
-              </div>
-            </div>
-          </div>
+        {/* Sign up button */}
+        <div className="flex h-[93px] items-center justify-center w-full mt-4">
+          <button
+            onClick={handleSignUp}
+            className="max-w-[480px] w-[463px] h-10 bg-black rounded-lg text-sm text-white font-bold"
+          >
+            Sign up
+          </button>
         </div>
 
-        <div className="flex flex-col items-center pt-1 pb-3 px-4 relative self-stretch w-full flex-[0_0_auto]">
-          <p className="relative self-stretch mt-[-1.00px] [font-family:'Inter-Regular',Helvetica] font-normal text-[#4f7296] text-sm text-center tracking-[0] leading-[21px]">
-            Already have an account? login
+        {/* Login link */}
+        <div className="flex flex-col items-center pt-1 pb-3 px-4 mt-3 w-full">
+          <p className="text-[#4f7296] text-sm text-center">
+            Already have an account?{" "}
+            <Link href="/login" className="font-bold text-black">
+              Log In
+            </Link>
           </p>
         </div>
+
       </div>
     </div>
   );
-};
+}

@@ -1,11 +1,4 @@
 
-const navigationItems = [
-  { label: "Pricing", href: "#pricing" },
-  { label: "Resources", href: "#resources" },
-  { label: "Sign Up", href: "#signup", isPrimary: true },
-  { label: "Log In", href: "#login" },
-];
-
 const features = [
   {
     id: 1,
