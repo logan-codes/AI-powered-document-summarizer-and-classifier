@@ -1,3 +1,11 @@
+/* Tiptap basic styles */
+.ProseMirror h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
+.ProseMirror h2 { font-size: 1.5em; font-weight: bold; margin: 0.75em 0; }
+.ProseMirror h3 { font-size: 1.17em; font-weight: bold; margin: 0.83em 0; }
+.ProseMirror ul, .ProseMirror ol { margin: 1em 0; padding-left: 2em; }
+.ProseMirror blockquote { border-left: 4px solid #ddd; margin: 1em 0; padding-left: 1em; color: #555; }
+.ProseMirror pre { background: #f4f4f4; padding: 1em; border-radius: 4px; font-family: monospace; }
+.ProseMirror a { color: #2563eb; text-decoration: underline; }
 @import "tailwindcss";
 @import "tw-animate-css";
 

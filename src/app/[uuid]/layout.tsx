@@ -15,7 +15,6 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
   const [expanded, setExpanded] = useState(false);
   const [uuid, setUuid] = useState<string | null>(null);
 
-  // Fetch logged-in user UUID
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user }, error } = await client.auth.getUser();
@@ -36,7 +35,7 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
         {/* Toast notifications */}
         <Toaster position="top-right" richColors />
 
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col min-h-screen">
           {/* Top Navbar */}
           <div className="fixed top-0 left-0 right-0 z-50">
             <TopNavBar />
@@ -49,7 +48,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
             {/* Content area */}
             <div
               className="flex-1 h-full overflow-y-auto transition-all duration-300"
-              style={{ marginLeft: expanded ? 240 : 64 }}
+              style={{ marginLeft: expanded ? 240 : 64,
+                height: `calc(100vh - 64px)`,
+               }}
             >
               {children}
             </div>

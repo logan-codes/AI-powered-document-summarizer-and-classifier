@@ -12,12 +12,16 @@ import {
   AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-} from "@/components/ui/alert-dialog"; // ShadCN alert dialog
+} from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Pencil, Trash2, Download, Plus } from "lucide-react";
 
 interface Draft {
   id: string;
   title: string;
   last_edited: string;
+  created_at?: string;
+  content?: string;
 }
 
 export default function DashboardPage() {
@@ -27,6 +31,8 @@ export default function DashboardPage() {
   const [renameId, setRenameId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
+  const [newOpen, setNewOpen] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const router = useRouter();
   const params = useParams();
   const uuid = params.uuid as string;
@@ -61,7 +67,7 @@ export default function DashboardPage() {
     fetchDrafts();
   }, [userId]);
 
-  const handleNewDraft = async () => {
+  const handleNewBlank = async () => {
     if (!userId) return;
     const { data, error } = await client
       .from("drafts")
@@ -71,6 +77,48 @@ export default function DashboardPage() {
 
     if (error) return console.error(error);
     router.push(`/${uuid}/draft/${data.id}`);
+  };
+
+  const handleUploadDocx = async (file: File) => {
+    if (!userId) return;
+    try {
+      const mammoth = await import("mammoth");
+      const arrayBuffer = await file.arrayBuffer();
+      const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
+      const title = file.name.replace(/\.docx$/i, "");
+      const { data, error } = await client
+        .from("drafts")
+        .insert({ user_id: userId, title: title || "Imported Document", content: html })
+        .select()
+        .single();
+      if (error) return console.error(error);
+      router.push(`/${uuid}/draft/${data.id}`);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to import .docx. Please ensure it is a valid Word document.");
+    }
+  };
+
+  const handleDownloadDocx = async (draft: Draft) => {
+    try {
+      const html = draft.content ?? (await (async () => {
+        const { data } = await client.from("drafts").select("content").eq("id", draft.id).single();
+        return (data?.content as string) || "";
+      })());
+      const htmlDocx = (await import("html-docx-js/dist/html-docx")).default;
+      const blob = htmlDocx.asBlob(`<!DOCTYPE html><html><head><meta charset='utf-8'></head><body>${html}</body></html>`);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${draft.title || "document"}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert("Failed to export as .docx");
+    }
   };
 
   const handleRenameConfirm = async () => {
@@ -96,12 +144,29 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
-        <button
-          onClick={handleNewDraft}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700"
-        >
-          + New
-        </button>
+        <Popover open={newOpen} onOpenChange={setNewOpen}>
+          <PopoverTrigger asChild>
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 inline-flex items-center gap-2">
+              <Plus size={16} /> New
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2">
+            <div className="flex flex-col gap-2">
+              <button className="w-full text-left px-3 py-2 rounded hover:bg-gray-100" onClick={() => { setNewOpen(false); handleNewBlank(); }}>
+                Create blank document
+              </button>
+              <button className="w-full text-left px-3 py-2 rounded hover:bg-gray-100" onClick={() => fileInputRef.current?.click()}>
+                Upload .docx
+              </button>
+              <input ref={fileInputRef} type="file" accept=".docx" className="hidden" onChange={(e) => {
+                const f = e.target.files?.[0];
+                setNewOpen(false);
+                if (f) handleUploadDocx(f);
+                e.currentTarget.value = "";
+              }} />
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Drafts Table */}
@@ -116,6 +181,7 @@ export default function DashboardPage() {
               <tr>
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Last Edited</th>
+                <th className="px-4 py-3 text-left">Created</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -127,17 +193,16 @@ export default function DashboardPage() {
                   onClick={() => router.push(`/${uuid}/draft/${draft.id}`)}
                 >
                   <td className="px-4 py-3">{draft.title}</td>
-                  <td className="px-4 py-3 text-gray-500">
-                    {new Date(draft.last_edited).toLocaleString()}
-                  </td>
+                  <td className="px-4 py-3 text-gray-500">{draft.last_edited ? new Date(draft.last_edited).toLocaleString() : "—"}</td>
+                  <td className="px-4 py-3 text-gray-500">{draft.created_at ? new Date(draft.created_at).toLocaleString() : "—"}</td>
                   <td
                     className="px-4 py-3 flex justify-end gap-2"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">
-                          Rename
+                        <button className="p-2 rounded hover:bg-gray-100" title="Rename">
+                          <Pencil size={16} />
                         </button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
@@ -172,14 +237,20 @@ export default function DashboardPage() {
                       </AlertDialogContent>
                     </AlertDialog>
 
-                    {/* Delete AlertDialog */}
+                    {/* Download DOCX */}
+                    <button className="p-2 rounded hover:bg-gray-100" title="Download as .docx" onClick={() => handleDownloadDocx(draft)}>
+                      <Download size={16} />
+                    </button>
+
+                    {/* Delete */}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <button
-                          className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-                          onClick={() => setDeleteId(draft.id)} // set the ID when opening dialog
+                          className="p-2 rounded hover:bg-red-50 text-red-600"
+                          onClick={() => setDeleteId(draft.id)}
+                          title="Delete"
                         >
-                          Delete
+                          <Trash2 size={16} />
                         </button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
