@@ -17,7 +17,7 @@ function ensureClient(): SupabaseClient {
 const client = new Proxy({} as SupabaseClient, {
   get(_target, prop) {
     const real = ensureClient();
-    // @ts-ignore dynamic access
+    // @ts-expect-error dynamic access on SupabaseClient
     return real[prop];
   },
 });
