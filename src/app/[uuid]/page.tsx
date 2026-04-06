@@ -9,6 +9,8 @@ export default async function DashboardPage({
   const resolvedParams = await params;
   const { uuid } = resolvedParams;
   
+  if (uuid === "favicon.ico") return null;
+  
   const supabase = await createServerSupabaseClient();
   
   // Pre-fetch drafts on the server

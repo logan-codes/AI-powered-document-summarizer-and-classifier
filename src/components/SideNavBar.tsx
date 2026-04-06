@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Home, Search, FileText, Settings, Plus } from "lucide-react";
+import { Home, Search, FileText, Settings, Plus, PanelLeft, PanelLeftClose } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
@@ -15,7 +15,8 @@ interface NavItem {
 }
 
 export default function SideNavBar() {
-  const { isSidebarExpanded, setSidebarExpanded, isMobileMenuOpen, uuid } = useAppStore();
+  const { isSidebarExpanded, setSidebarExpanded, isSidebarPinned, setSidebarPinned, isMobileMenuOpen, uuid } = useAppStore();
+  const isExpanded = isSidebarExpanded || isSidebarPinned || isMobileMenuOpen;
   const router = useRouter();
   const supabase = createClient();
 
@@ -57,15 +58,15 @@ export default function SideNavBar() {
 
   return (
     <div
-      className={`fixed left-0 flex flex-col justify-between bg-[#f7f9fc] border-r transition-transform duration-300 group z-40 ${
+      className={`fixed left-0 flex flex-col justify-between bg-sidebar border-r border-sidebar-border transition-transform duration-300 group z-40 ${
         isMobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
       }`}
-      onMouseEnter={() => setSidebarExpanded(true)}
-      onMouseLeave={() => setSidebarExpanded(false)}
+      onMouseEnter={() => !isSidebarPinned && setSidebarExpanded(true)}
+      onMouseLeave={() => !isSidebarPinned && setSidebarExpanded(false)}
       style={{
         top: "64px",
         height: "calc(100vh - 64px)",
-        width: isSidebarExpanded || isMobileMenuOpen ? "240px" : "64px",
+        width: isExpanded ? "240px" : "64px",
       }}
     >
       {/* Top Section */}
@@ -74,13 +75,13 @@ export default function SideNavBar() {
           <div
             key={index}
             onClick={() => item.path && router.push(item.path)}
-            className={`flex items-center cursor-pointer gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
-              isSidebarExpanded || isMobileMenuOpen ? "justify-start" : "justify-center"
+            className={`flex items-center cursor-pointer gap-3 px-3 py-2 rounded-lg hover:bg-sidebar-accent transition-colors ${
+              isExpanded ? "justify-start" : "justify-center"
             }`}
           >
-            <span className="text-gray-700">{item.icon}</span>
-            {(isSidebarExpanded || isMobileMenuOpen) && (
-              <span className="text-sm font-medium text-[#0c141c]">
+            <span className="text-sidebar-foreground/80">{item.icon}</span>
+            {isExpanded && (
+              <span className="text-sm font-medium text-sidebar-foreground">
                 {item.label}
               </span>
             )}
@@ -92,12 +93,14 @@ export default function SideNavBar() {
       <div className="flex flex-col gap-3 p-4">
         <Button
           onClick={handleNewDraft}
-          className={`bg-[#197fe5] hover:bg-blue-700 text-white w-full justify-center ${
-            !(isSidebarExpanded || isMobileMenuOpen) ? "px-0" : ""
+          className={`bg-primary hover:bg-primary/90 text-primary-foreground w-full justify-center px-0 overflow-hidden shadow-sm ${
+            isExpanded ? "px-4" : ""
           }`}
         >
-          <Plus size={18} className={!(isSidebarExpanded || isMobileMenuOpen) ? "" : "mr-2"} />
-          {(isSidebarExpanded || isMobileMenuOpen) && "New Case"}
+          <div className="flex items-center justify-center">
+            <Plus size={18} className={isExpanded ? "mr-2 flex-shrink-0" : "flex-shrink-0"} />
+            {isExpanded && <span className="whitespace-nowrap">New Case</span>}
+          </div>
         </Button>
       </div>
     </div>

@@ -10,6 +10,7 @@ import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, List, ListOrde
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { createClient } from "@/lib/supabase";
 import TextAlign from "@tiptap/extension-text-align";
+import { toast } from "sonner";
 
 interface Draft {
   id: string;
@@ -129,16 +130,16 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
   if (!draft || !editor) return <div>Loading editor...</div>;
 
   return (
-    <div className="flex-1 flex flex-col h-full">
-      <div className="flex justify-between items-center p-4 border-b bg-white sticky top-0 z-10">
-        <h1 className="text-2xl font-bold">{draft.title}</h1>
-        <button onClick={handleSave} className="bg-blue-600 text-white px-4 py-2 rounded">
+    <div className="flex-1 flex flex-col h-full bg-background text-foreground">
+      <div className="flex justify-between items-center p-4 border-b border-border bg-card sticky top-0 z-10 transition-colors">
+        <h1 className="text-2xl font-bold tracking-tight">{draft.title}</h1>
+        <button onClick={handleSave} className="bg-primary hover:opacity-90 text-primary-foreground px-4 py-2 rounded-lg font-medium shadow-sm transition-opacity">
           {saving ? "Saving..." : "Save"}
         </button>
       </div>
 
       <div
-        className="flex gap-1 p-2 border-b bg-gray-50 sticky z-10 items-center"
+        className="flex gap-1 p-2 border-b border-border bg-muted/30 sticky z-10 items-center overflow-x-auto transition-colors"
         style={{ top: 0 }}
       >
         {/* Send selected text to AI chat */}
@@ -148,7 +149,10 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
           title="Send selected text to AI Chat"
           onClick={() => {
             const selected = getSelectedText();
-            if (selected && onSendSelectedText) onSendSelectedText(selected);
+            if (selected && onSendSelectedText) {
+              onSendSelectedText(selected);
+              toast.success("Text sent to AI context");
+            }
           }}
         >
           Send to AI Chat
@@ -211,9 +215,9 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
         <Button variant="ghost" size="icon" title="Clear Formatting" onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}><Eraser /></Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50">
-        <div id="editor-page-container" className="relative mx-auto bg-white shadow border w-full max-w-4xl min-h-[800px]">
-          <div className="p-4 sm:p-8">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-muted/10">
+        <div id="editor-page-container" className="relative mx-auto bg-card shadow-sm border border-border w-full max-w-4xl min-h-[800px] transition-colors">
+          <div className="p-4 sm:p-8 prose dark:prose-invert max-w-none prose-p:leading-relaxed">
             <EditorContent editor={editor} />
           </div>
           {showSelectionTip && selectionPos && (
@@ -223,7 +227,10 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
                 const selected = getSelectedText();
-                if (selected && onSendSelectedText) onSendSelectedText(selected);
+                if (selected && onSendSelectedText) {
+                  onSendSelectedText(selected);
+                  toast.success("Text sent to AI context");
+                }
               }}
             >
               Send to AI

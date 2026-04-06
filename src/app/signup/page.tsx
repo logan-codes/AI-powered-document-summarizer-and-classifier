@@ -1,8 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import { signUpUser } from "@/lib/auth";
-import { toast } from "sonner"; // ✅ import Sonner
+import { toast } from "sonner";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 export default function SignUp() {
   const [name, setName] = useState("");
@@ -23,8 +26,6 @@ export default function SignUp() {
     try {
       await signUpUser(email, password, name);
       toast.success("Signup successful! Check your email for confirmation.");
-
-      // Reset fields
       setName("");
       setEmail("");
       setPassword("");
@@ -39,105 +40,88 @@ export default function SignUp() {
   };
 
   return (
-    <div className="flex flex-col h-[1024px] items-center relative bg-white">
-      <div className="flex flex-col max-w-[960px] w-[960px] h-[705px] items-center justify-center px-0 py-5 relative">
-
-        <div className="relative self-stretch font-bold text-[#0c141c] text-[28px] text-center leading-[35px]">
-          Sign up
-        </div>
-
-        {/* Name */}
-        <div className="relative self-stretch w-full h-28 mt-5">
-          <div className="flex-col w-[935px] items-start flex relative">
-            <div className="flex w-[691px] items-start pt-0 pb-2 flex-col relative">
-              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
-                Name*
-              </div>
-            </div>
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
-            />
-          </div>
-        </div>
-
-        {/* Email */}
-        <div className="relative self-stretch w-full mt-3">
-          <div className="flex-col w-[938px] h-[88px] items-center flex relative">
-            <div className="flex-col items-start pt-0 pb-2 flex-col relative w-full">
-              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
-                Email id*
-              </div>
-            </div>
-            <input
-              type="email"
-              placeholder="Enter your email id"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
-            />
-          </div>
-        </div>
-
-        {/* Password */}
-        <div className="flex flex-wrap items-start justify-around gap-4 px-4 py-3 w-full mt-3">
-          <div className="flex-col min-w-40 items-start flex-1 flex relative">
-            <div className="flex-col items-start pt-0 pb-2 flex-col relative w-full">
-              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
-                Password*
-              </div>
-            </div>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
-            />
-          </div>
-        </div>
-
-        {/* Confirm Password */}
-        <div className="flex flex-wrap w-full items-end gap-4 px-4 py-3 mt-3">
-          <div className="flex-col min-w-40 items-start flex-1 flex relative">
-            <div className="flex-col items-start pt-0 pb-2 flex-col relative w-full">
-              <div className="self-stretch font-medium text-[#0c141c] text-base leading-6">
-                Confirm password*
-              </div>
-            </div>
-            <input
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="h-14 w-full p-4 bg-[#e8edf2] rounded-lg"
-            />
-          </div>
-        </div>
-
-        {/* Sign up button */}
-        <div className="flex h-[93px] items-center justify-center w-full mt-4">
-          <button
-            onClick={handleSignUp}
-            className="max-w-[480px] w-[463px] h-10 bg-black rounded-lg text-sm text-white font-bold"
-          >
-            Sign up
-          </button>
-        </div>
-
-        {/* Login link */}
-        <div className="flex flex-col items-center pt-1 pb-3 px-4 mt-3 w-full">
-          <p className="text-[#4f7296] text-sm text-center">
-            Already have an account?{" "}
-            <Link href="/login" className="font-bold text-black">
-              Log In
-            </Link>
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="max-w-md w-full bg-card rounded-2xl shadow-xl border border-border p-8 space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-black text-card-foreground tracking-tight">
+            Create an Account
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Join us to streamline your legal research.
           </p>
         </div>
 
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-foreground font-medium">
+              Full Name
+            </Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-background border-input h-12"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-foreground font-medium">
+              Email Address
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-background border-input h-12"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-foreground font-medium">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-background border-input h-12"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-foreground font-medium">
+              Confirm Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="bg-background border-input h-12"
+            />
+          </div>
+
+          <Button 
+            onClick={handleSignUp} 
+            className="w-full h-12 bg-primary hover:opacity-90 text-primary-foreground font-bold rounded-lg transition-all mt-4"
+          >
+            Sign Up
+          </Button>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="font-semibold text-primary hover:opacity-80 transition-opacity">
+            Log In
+          </Link>
+        </p>
       </div>
     </div>
   );

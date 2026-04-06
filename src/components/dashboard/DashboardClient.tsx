@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -14,7 +15,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Pencil, Trash2, Download, Plus } from "lucide-react";
+import { Pencil, Trash2, Download, Plus, FileX } from "lucide-react";
 
 interface Draft {
   id: string;
@@ -109,22 +110,22 @@ export default function DashboardClient({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-y-auto p-6">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto p-6 bg-background">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">Documents</h1>
         <Popover open={newOpen} onOpenChange={setNewOpen}>
           <PopoverTrigger asChild>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 inline-flex items-center gap-2">
-              <Plus size={16} /> New
+            <button className="bg-primary text-primary-foreground px-4 py-2.5 rounded-lg font-medium hover:opacity-90 inline-flex items-center gap-2 shadow-sm transition-opacity">
+              <Plus size={16} /> New Document
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-56 p-2">
-            <div className="flex flex-col gap-2">
-              <button className="w-full text-left px-3 py-2 rounded hover:bg-gray-100" onClick={() => { setNewOpen(false); handleNewBlank(); }}>
+          <PopoverContent className="w-56 p-2 rounded-xl shadow-lg border border-border bg-popover text-popover-foreground">
+            <div className="flex flex-col gap-1">
+              <button className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-muted font-medium transition-colors" onClick={() => { setNewOpen(false); handleNewBlank(); }}>
                 Create blank document
               </button>
-              <button className="w-full text-left px-3 py-2 rounded hover:bg-gray-100" onClick={() => fileInputRef.current?.click()}>
+              <button className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-muted font-medium transition-colors" onClick={() => fileInputRef.current?.click()}>
                 Upload .docx
               </button>
               <input ref={fileInputRef} type="file" accept=".docx" className="hidden" onChange={(e) => {
@@ -138,119 +139,145 @@ export default function DashboardClient({
         </Popover>
       </div>
 
-      {/* Drafts Table */}
+      {/* Drafts Table / Empty State */}
       {drafts.length === 0 ? (
-        <div className="text-gray-500">No drafts found. Click &quot;New&quot; to create one.</div>
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border mt-2 rounded-2xl bg-muted/30"
+        >
+          <div className="bg-card p-4 rounded-2xl shadow-sm mb-5 border border-border">
+            <FileX className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <h3 className="text-lg font-bold text-foreground mb-2">No documents found</h3>
+          <p className="text-muted-foreground text-center max-w-sm mb-6 leading-relaxed">
+            Get started by creating a new blank document or importing an existing .docx file from your computer.
+          </p>
+          <button 
+            onClick={() => setNewOpen(true)}
+            className="bg-card border border-border text-foreground px-6 py-2.5 rounded-lg font-medium hover:bg-muted transition-colors shadow-sm"
+          >
+            Create
+          </button>
+        </motion.div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 rounded-lg bg-white shadow-sm">
-            <thead className="bg-gray-100 text-gray-700 text-sm font-medium">
+          <table className="min-w-full border border-border rounded-xl bg-card shadow-sm overflow-hidden">
+            <thead className="bg-muted/50 border-b border-border text-muted-foreground text-sm font-bold uppercase tracking-wider">
               <tr>
-                <th className="px-4 py-3 text-left">Name</th>
-                <th className="px-4 py-3 text-left">Last Edited</th>
-                <th className="px-4 py-3 text-left">Created</th>
-                <th className="px-4 py-3 text-right">Actions</th>
+                <th className="px-5 py-4 text-left">Document Name</th>
+                <th className="px-5 py-4 text-left">Last Edited</th>
+                <th className="px-5 py-4 text-left">Created</th>
+                <th className="px-5 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {drafts.map((draft) => (
-                <tr
-                  key={draft.id}
-                  className="border-t hover:bg-gray-50 transition cursor-pointer"
-                  onClick={() => router.push(`/${uuid}/draft/${draft.id}`)}
-                >
-                  <td className="px-4 py-3">{draft.title}</td>
-                  <td className="px-4 py-3 text-gray-500">{draft.last_edited ? new Date(draft.last_edited).toLocaleString() : "—"}</td>
-                  <td className="px-4 py-3 text-gray-500">{draft.created_at ? new Date(draft.created_at).toLocaleString() : "—"}</td>
-                  <td
-                    className="px-4 py-3 flex justify-end gap-2"
-                    onClick={(e) => e.stopPropagation()}
+              <AnimatePresence>
+                {drafts.map((draft, index) => (
+                  <motion.tr
+                    key={draft.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer group"
+                    onClick={() => router.push(`/${uuid}/draft/${draft.id}`)}
                   >
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button className="p-2 rounded hover:bg-gray-100" title="Rename">
-                          <Pencil size={16} />
-                        </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Rename Document</AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <div className="mt-2">
-                          <input
-                            type="text"
-                            placeholder="New title"
-                            className="w-full border rounded px-2 py-1"
-                            value={newTitle}
-                            onChange={(e) => {
-                              setRenameId(draft.id);
-                              setNewTitle(e.target.value);
-                            }}
-                          />
-                        </div>
-                        <div className="mt-4 flex justify-end gap-2">
-                          <AlertDialogCancel
-                            onClick={() => {
-                              setRenameId(null);
-                              setNewTitle("");
-                            }}
+                    <td className="px-5 py-4 font-medium text-foreground">{draft.title}</td>
+                    <td className="px-5 py-4 text-muted-foreground text-sm">{draft.last_edited ? new Date(draft.last_edited).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}</td>
+                    <td className="px-5 py-4 text-muted-foreground text-sm">{draft.created_at ? new Date(draft.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : "—"}</td>
+                    <td
+                      className="px-5 py-4 flex justify-end gap-1 transition-opacity"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Rename">
+                            <Pencil size={16} />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="rounded-xl border-border bg-card">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Rename Document</AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <div className="mt-3">
+                            <input
+                              type="text"
+                              placeholder="New title"
+                              className="w-full border border-input rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-ring focus:outline-none bg-background text-foreground"
+                              value={newTitle}
+                              onChange={(e) => {
+                                setRenameId(draft.id);
+                                setNewTitle(e.target.value);
+                              }}
+                            />
+                          </div>
+                          <div className="mt-5 flex justify-end gap-2">
+                            <AlertDialogCancel
+                              className="rounded-lg border-border hover:bg-muted"
+                              onClick={() => {
+                                setRenameId(null);
+                                setNewTitle("");
+                              }}
+                            >
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction className="bg-primary hover:opacity-90 text-primary-foreground rounded-lg" onClick={handleRenameConfirm}>
+                              Rename
+                            </AlertDialogAction>
+                          </div>
+                        </AlertDialogContent>
+                      </AlertDialog>
+
+                      {/* Download DOCX */}
+                      <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Download as .docx" onClick={() => handleDownloadDocx(draft)}>
+                        <Download size={16} />
+                      </button>
+
+                      {/* Delete */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            className="p-2 rounded-lg hover:bg-destructive/10 text-destructive transition-colors"
+                            onClick={() => setDeleteId(draft.id)}
+                            title="Delete"
                           >
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction onClick={handleRenameConfirm}>
-                            Rename
-                          </AlertDialogAction>
-                        </div>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <Trash2 size={16} />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="rounded-xl border-border bg-card">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Document</AlertDialogTitle>
+                            <AlertDialogDescription className="text-muted-foreground">
+                              Are you sure you want to delete &quot;{draft.title}&quot;? This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <div className="mt-5 flex justify-end gap-2">
+                            <AlertDialogCancel className="rounded-lg border-border hover:bg-muted" onClick={() => setDeleteId(null)}>
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-lg"
+                              onClick={async () => {
+                                if (!deleteId) return;
+                                const { error } = await supabase
+                                  .from("drafts")
+                                  .delete()
+                                  .eq("id", deleteId);
+                                if (!error) setDrafts((prev) => prev.filter((d) => d.id !== deleteId));
+                                setDeleteId(null);
+                              }}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </div>
+                        </AlertDialogContent>
+                      </AlertDialog>
 
-                    {/* Download DOCX */}
-                    <button className="p-2 rounded hover:bg-gray-100" title="Download as .docx" onClick={() => handleDownloadDocx(draft)}>
-                      <Download size={16} />
-                    </button>
-
-                    {/* Delete */}
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button
-                          className="p-2 rounded hover:bg-red-50 text-red-600"
-                          onClick={() => setDeleteId(draft.id)}
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete Document</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete &quot;{draft.title}&quot;?
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <div className="mt-4 flex justify-end gap-2">
-                          <AlertDialogCancel onClick={() => setDeleteId(null)}>
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={async () => {
-                              if (!deleteId) return;
-                              const { error } = await supabase
-                                .from("drafts")
-                                .delete()
-                                .eq("id", deleteId);
-                              if (!error) setDrafts((prev) => prev.filter((d) => d.id !== deleteId));
-                              setDeleteId(null);
-                            }}
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </div>
-                      </AlertDialogContent>
-                    </AlertDialog>
-
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </motion.tr>
+                ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </div>

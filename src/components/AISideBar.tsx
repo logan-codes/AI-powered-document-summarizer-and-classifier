@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase";
+import ReactMarkdown from "react-markdown";
+import { marked } from "marked";
 
 interface AISidebarProps {
   isOpen: boolean;
@@ -90,8 +92,8 @@ export default function AISidebar({
     <div
       className={`fixed right-0 flex flex-col transition-all duration-300 z-40 ${
         isOpen 
-          ? "border-l shadow-2xl bg-gray-100 max-lg:!w-[300px] max-lg:max-w-[85vw]" 
-          : "w-12 max-lg:!bg-transparent max-lg:shadow-none max-lg:border-0 border-l shadow-lg bg-gray-100"
+          ? "border-l border-border shadow-2xl bg-sidebar max-lg:!w-[300px] max-lg:max-w-[85vw]" 
+          : "w-12 max-lg:!bg-transparent max-lg:shadow-none max-lg:border-0 border-l border-border shadow-lg bg-sidebar"
       }`}
       style={{
         top: `${topBarHeight}px`,
@@ -100,11 +102,11 @@ export default function AISidebar({
       }}
     >
       {/* Header */}
-      <div className="flex justify-between items-center border-b bg-white flex-shrink-0 p-3">
-        {isOpen && <h2 className="font-bold text-sm">AI Assistant</h2>}
+      <div className="flex justify-between items-center border-b border-border bg-card flex-shrink-0 p-3 transition-colors">
+        {isOpen && <h2 className="font-bold text-sm text-card-foreground">AI Assistant</h2>}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-sm text-gray-500 hover:text-black"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           {isOpen ? "➤" : "AI"}
         </button>
@@ -116,17 +118,23 @@ export default function AISidebar({
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`p-2 rounded max-w-[75%] ${
+              className={`p-3 rounded-lg max-w-[85%] shadow-sm ${
                 msg.role === "user"
-                  ? "bg-blue-500 text-white self-end"
-                  : "bg-gray-200 text-black self-start"
+                  ? "bg-primary text-primary-foreground self-end"
+                  : "bg-card text-card-foreground self-start border border-border"
               }`}
             >
-              <div className="whitespace-pre-wrap text-sm">{msg.message}</div>
+              <div className={`text-sm ${msg.role === "assistant" ? "prose dark:prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:bg-muted prose-pre:text-foreground" : ""}`}>
+                {msg.role === "assistant" ? (
+                  <ReactMarkdown>{msg.message}</ReactMarkdown>
+                ) : (
+                  <div className="whitespace-pre-wrap">{msg.message}</div>
+                )}
+              </div>
               {msg.role === "assistant" && (
-                <div className="mt-1 flex gap-2 text-xs">
+                <div className="mt-3 flex gap-3 text-xs font-medium border-t border-border pt-2">
                   <button
-                    className="text-gray-600 hover:text-black"
+                    className="text-muted-foreground hover:text-primary transition-colors"
                     onClick={() => navigator.clipboard.writeText(msg.message)}
                     title="Copy"
                   >
@@ -134,11 +142,14 @@ export default function AISidebar({
                   </button>
                   {editorApi && (
                     <button
-                      className="text-gray-600 hover:text-black"
-                      onClick={() => editorApi.replaceSelection(msg.message)}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                      onClick={async () => {
+                        const html = await marked.parse(msg.message);
+                        editorApi.replaceSelection(html);
+                      }}
                       title="Apply to document"
                     >
-                      Apply
+                      Apply to Doc
                     </button>
                   )}
                 </div>
@@ -146,7 +157,7 @@ export default function AISidebar({
             </div>
           ))}
           {loading && (
-            <div className="p-2 rounded bg-gray-200 text-gray-500 self-start text-sm animate-pulse">
+            <div className="p-2 rounded-lg bg-muted text-muted-foreground self-start text-sm animate-pulse border border-border">
               AI is typing…
             </div>
           )}
@@ -155,12 +166,17 @@ export default function AISidebar({
 
       {/* Input */}
       {isOpen && (
-        <div className="flex-shrink-0 p-3 border-t bg-white flex gap-2">
-          <input
+        <div className="flex-shrink-0 p-4 border-t border-border bg-card flex gap-2 items-end shadow-sm z-10 w-full relative transition-colors">
+          <textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = e.target.scrollHeight + 'px';
+            }}
             placeholder="Ask AI..."
-            className="flex-1 border rounded p-2 text-sm"
+            rows={1}
+            className="flex-1 border border-input rounded-xl p-3 text-sm resize-none max-h-[160px] overflow-y-auto focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground transition-all"
             disabled={loading}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
@@ -172,7 +188,7 @@ export default function AISidebar({
           <button
             onClick={handleSend}
             disabled={loading}
-            className="bg-blue-600 text-white px-3 py-2 rounded disabled:opacity-50"
+            className="bg-primary text-primary-foreground px-4 h-[46px] rounded-xl disabled:opacity-50 hover:opacity-90 font-semibold flex items-center justify-center transition-opacity shadow-sm"
           >
             Send
           </button>
@@ -180,7 +196,7 @@ export default function AISidebar({
       )}
 
       {!isOpen && (
-        <div className="flex-1 flex items-center justify-center text-gray-400 text-xs -rotate-90">
+        <div className="flex-1 flex items-center justify-center text-muted-foreground text-xs -rotate-90">
           AI
         </div>
       )}

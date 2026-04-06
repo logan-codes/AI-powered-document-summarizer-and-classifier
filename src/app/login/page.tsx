@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import { loginUser } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { toast } from "sonner"; // ✅ import Sonner
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,13 +18,11 @@ export default function Login() {
       toast.error("Please fill in both email and password.");
       return;
     }
-
     try {
-      const userId = await loginUser(email, password); // get UUID
+      const userId = await loginUser(email, password);
       if (!userId) throw new Error("User ID not found");
-
       toast.success("Login successful!");
-      router.push(`/${userId}`); // redirect to /uuid
+      router.push(`/${userId}`);
     } catch (err: unknown) {
       if (err instanceof Error) {
         toast.error(err.message);
@@ -34,77 +33,65 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col h-[1024px] items-center relative bg-white">
-      <div className="flex flex-col w-[967px] h-[963px] items-start px-0 py-5 relative mb-[-4px]">
-
-        {/* Header */}
-        <div className="flex flex-col h-[67px] items-center pt-5 pb-3 px-4 relative self-stretch w-full">
-          <p className="flex-1 self-stretch font-bold text-[#0c141c] text-[28px] text-center leading-[35px]">
-            Log in to your account
+    <div className="min-h-screen flex items-center justify-center bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <div className="max-w-md w-full bg-card rounded-2xl shadow-xl border border-border p-8 space-y-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-black text-card-foreground tracking-tight">
+            Welcome Back
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Log in to continue to your dashboard.
           </p>
         </div>
 
-        {/* Email */}
-        <div className="relative self-stretch w-full h-28">
-          <div className="flex-col w-[935px] h-[88px] items-start top-3 left-4 flex relative">
-            <div className="flex flex-col items-start pt-0 pb-2 relative self-stretch w-full">
-              <Label htmlFor="email" className="font-medium text-[#0c141c] text-base leading-6">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-14 w-full p-4 bg-[#f7f9fc] rounded-lg border border-[#d1dbe8] mt-4"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Password */}
-        <div className="flex flex-wrap items-center justify-center gap-4 px-4 py-3 self-stretch w-full mt-3">
-          <div className="flex-col w-[933px] items-start flex relative">
-            <Label htmlFor="password" className="font-medium text-[#0c141c] text-base leading-6">
-              Password
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-foreground font-medium">
+              Email Address
             </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="bg-background border-input h-12"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-foreground font-medium">
+                Password
+              </Label>
+              <div className="text-sm font-medium text-primary hover:opacity-80 cursor-pointer transition-opacity">
+                Forgot Password?
+              </div>
+            </div>
             <Input
               id="password"
               type="password"
-              placeholder="Password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-14 w-full p-4 bg-[#f7f9fc] rounded-lg border border-[#d1dbe8] mt-4"
+              className="bg-background border-input h-12"
             />
           </div>
-        </div>
 
-        {/* Forgot password */}
-        <div className="flex w-[400px] items-center justify-end pt-1 pb-3 px-4">
-          <div className="text-[#4f7296] text-sm cursor-pointer">Forgot Password?</div>
-        </div>
-
-        {/* Login Button */}
-        <div className="flex items-center justify-center px-4 py-3 self-stretch w-full">
-          <button
-            onClick={handleLogin}
-            className="min-w-[84px] max-w-[480px] h-12 w-full bg-black rounded-lg text-white font-bold"
+          <Button 
+            onClick={handleLogin} 
+            className="w-full h-12 bg-primary hover:opacity-90 text-primary-foreground font-bold rounded-lg transition-all"
           >
             Log In
-          </button>
+          </Button>
         </div>
 
-        {/* Signup link */}
-        <div className="flex flex-col items-center pt-1 pb-3 px-4 self-stretch w-full mt-3">
-          <p className="text-black text-sm text-center">
-            Don’t have an account?{" "}
-            <Link href="/signup" className="text-blue-600 underline">
-              Sign Up
-            </Link>
-          </p>
-        </div>
-
+        <p className="text-center text-sm text-muted-foreground">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="font-semibold text-primary hover:opacity-80 transition-opacity">
+            Sign Up
+          </Link>
+        </p>
       </div>
     </div>
   );

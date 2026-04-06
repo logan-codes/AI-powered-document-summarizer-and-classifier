@@ -1,27 +1,33 @@
+import { Search, FileText, Library, LayoutDashboard } from "lucide-react";
+
 const features = [
   {
     id: 1,
     title: "Case Research",
     description:
       "Search and analyze millions of legal cases with advanced filtering and sorting options.",
+    icon: Search,
   },
   {
     id: 2,
     title: "Document Summarization",
     description:
       "Quickly summarize lengthy legal documents and extract key information for efficient review.",
+    icon: FileText,
   },
   {
     id: 3,
     title: "Case Resource",
     description:
       "Access a library of resources, including articles, webinars, and tutorials, to enhance your legal knowledge.",
+    icon: Library,
   },
   {
     id: 4,
     title: "Case Workspace",
     description:
       "Manage your cases, documents, and research in a centralized workspace for better organization and collaboration.",
+    icon: LayoutDashboard,
   },
 ];
 
@@ -45,10 +51,7 @@ export default function FeaturesSection() {
             className="flex flex-col p-6 bg-slate-50 rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all group"
           >
             <div className="h-10 w-10 bg-blue-100 rounded-lg mb-4 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              {/* Placeholder for icon */}
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+              <feature.icon className="w-5 h-5" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">
               {feature.title}

@@ -4,7 +4,7 @@ import Footer from "@/components/landing/Footer";
 
 export default function Landing() {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         <HeroSection />
         <FeaturesSection />
