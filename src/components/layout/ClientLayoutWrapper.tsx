@@ -3,10 +3,14 @@
 import React from "react";
 import SideNavBar from "@/components/SideNavBar";
 import { useAppStore } from "@/store/useAppStore";
+import { useSessionGuard } from "@/hooks/useSessionGuard";
 
 export default function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const { isSidebarExpanded, isSidebarPinned, isMobileMenuOpen, setMobileMenuOpen } = useAppStore();
   const isExpanded = isSidebarExpanded || isSidebarPinned;
+
+  // Enforce 60-minute JWT session — auto sign-out on expiry
+  useSessionGuard();
 
   return (
     <div className="flex flex-1">
