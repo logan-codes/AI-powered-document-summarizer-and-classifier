@@ -1,6 +1,7 @@
-import client from "./supabase";
+import { createClient } from "./supabase";
 
 export const createDraft = async () => {
+  const client = createClient();
   // Get the authenticated user
   const { data: { user }, error: userError } = await client.auth.getUser();
   if (userError || !user) throw new Error("Not authenticated");
