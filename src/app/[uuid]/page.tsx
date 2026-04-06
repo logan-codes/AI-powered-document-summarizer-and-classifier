@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { useRouter, useParams } from "next/navigation";
 import {
   AlertDialog,
@@ -36,24 +36,25 @@ export default function DashboardPage() {
   const router = useRouter();
   const params = useParams();
   const uuid = params.uuid as string;
+  const supabase = createClient();
 
   useEffect(() => {
     const fetchUser = async () => {
       const {
         data: { user },
         error,
-      } = await client.auth.getUser();
+      } = await supabase.auth.getUser();
       if (error || !user) router.push("/login");
       else setUserId(user.id);
     };
     fetchUser();
-  }, [router]);
+  }, [router, supabase]);
 
   useEffect(() => {
     if (!userId) return;
     const fetchDrafts = async () => {
       setLoading(true);
-      const { data, error } = await client
+      const { data, error } = await supabase
         .from("drafts")
         .select("*")
         .eq("user_id", userId)
@@ -65,11 +66,11 @@ export default function DashboardPage() {
     };
 
     fetchDrafts();
-  }, [userId]);
+  }, [userId, supabase]);
 
   const handleNewBlank = async () => {
     if (!userId) return;
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from("drafts")
       .insert({ user_id: userId, title: "Untitled Document", content: "" })
       .select()
@@ -86,7 +87,7 @@ export default function DashboardPage() {
       const arrayBuffer = await file.arrayBuffer();
       const { value: html } = await mammoth.convertToHtml({ arrayBuffer });
       const title = file.name.replace(/\.docx$/i, "");
-      const { data, error } = await client
+      const { data, error } = await supabase
         .from("drafts")
         .insert({ user_id: userId, title: title || "Imported Document", content: html })
         .select()
@@ -102,7 +103,7 @@ export default function DashboardPage() {
   const handleDownloadDocx = async (draft: Draft) => {
     try {
       const html = draft.content ?? (await (async () => {
-        const { data } = await client.from("drafts").select("content").eq("id", draft.id).single();
+        const { data } = await supabase.from("drafts").select("content").eq("id", draft.id).single();
         return (data?.content as string) || "";
       })());
       const htmlDocx = (await import("html-docx-js/dist/html-docx")).default;
@@ -123,7 +124,7 @@ export default function DashboardPage() {
 
   const handleRenameConfirm = async () => {
     if (!renameId || !newTitle) return;
-    const { error } = await client
+    const { error } = await supabase
       .from("drafts")
       .update({ title: newTitle, last_edited: new Date() })
       .eq("id", renameId);
@@ -267,7 +268,7 @@ export default function DashboardPage() {
                           <AlertDialogAction
                             onClick={async () => {
                               if (!deleteId) return;
-                              const { error } = await client
+                              const { error } = await supabase
                                 .from("drafts")
                                 .delete()
                                 .eq("id", deleteId);

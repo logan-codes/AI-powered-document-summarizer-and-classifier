@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import Link from "next/link";
 
 interface Template {
@@ -22,6 +22,7 @@ export default function SearchPage() {
   const [clauses, setClauses] = useState<Clause[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const supabase = createClient();
 
   async function handleSearch() {
     if (!query.trim()) return;
@@ -30,7 +31,7 @@ export default function SearchPage() {
     setSearched(true);
 
     // Search templates
-    const { data: templateData, error: templateError } = await client
+    const { data: templateData, error: templateError } = await supabase
       .from("templates")
       .select("id, title, description")
       .ilike("title", `%${query}%`);
@@ -39,7 +40,7 @@ export default function SearchPage() {
     setTemplates(templateData || []);
 
     // Search clauses
-    const { data: clauseData, error: clauseError } = await client
+    const { data: clauseData, error: clauseError } = await supabase
       .from("clauses")
       .select("id, title, content")
       .or(`title.ilike.%${query}%,content.ilike.%${query}%`);

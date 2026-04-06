@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import Link from "next/link";
 
 interface Template {
@@ -14,10 +14,11 @@ interface Template {
 export default function TemplatesPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
     async function fetchTemplates() {
-      const { data, error } = await client
+      const { data, error } = await supabase
         .from("templates")
         .select("*")
         .eq("public", true);
@@ -31,7 +32,7 @@ export default function TemplatesPage() {
     }
 
     fetchTemplates();
-  }, []);
+  }, [supabase]);
 
   if (loading) return <div className="p-6">Loading templates...</div>;
 

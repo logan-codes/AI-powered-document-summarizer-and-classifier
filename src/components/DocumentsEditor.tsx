@@ -8,7 +8,7 @@ import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import { Bold, Italic, Underline as UnderlineIcon, Strikethrough, List, ListOrdered, Quote, Undo2, Redo2, Heading1, Heading2, Heading3, Link2, Code2, Paintbrush2, Eraser, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import TextAlign from "@tiptap/extension-text-align";
 
 interface Draft {
@@ -29,6 +29,7 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
   onSendSelectedText,
   registerApi,
 }) => {
+  const supabase = createClient();
   // Get selected text from editor
   const getSelectedText = () => {
     if (!editor) return "";
@@ -98,14 +99,14 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
   useEffect(() => {
     const fetchDraft = async () => {
       if (!draftId) return;
-      const { data, error } = await client.from("drafts").select("*").eq("id", draftId).single();
+      const { data, error } = await supabase.from("drafts").select("*").eq("id", draftId).single();
       if (error) console.error(error);
       else if (data) {
         setDraft(data);
       }
     };
     fetchDraft();
-  }, [draftId]);
+  }, [draftId, supabase]);
 
   useEffect(() => {
     if (editor && draft && !initialContentSet) {
@@ -117,7 +118,7 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
   const handleSave = async () => {
     if (!draft) return;
     setSaving(true);
-    const { error } = await client
+    const { error } = await supabase
       .from("drafts")
       .update({ content: draft.content, last_edited: new Date().toISOString() })
       .eq("id", draft.id);

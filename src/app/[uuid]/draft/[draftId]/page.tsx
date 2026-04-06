@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DocumentsEditor from "@/components/DocumentsEditor";
 import AISidebar from "@/components/AISideBar";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export default function DraftPage() {
   const params = useParams();
@@ -22,6 +22,7 @@ export default function DraftPage() {
   });
   const [isResizing, setIsResizing] = useState(false);
   const [editorApi, setEditorApi] = useState<{ replaceSelection: (html: string) => void; insertAtCursor: (html: string) => void } | null>(null);
+  const supabase = createClient();
 
   useEffect(() => {
     const onUp = () => setIsResizing(false);
@@ -34,12 +35,12 @@ export default function DraftPage() {
   // Fetch logged-in user
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user }, error } = await client.auth.getUser();
+      const { data: { user }, error } = await supabase.auth.getUser();
       if (!user || error) window.location.href = "/login";
       else setUuid(user.id);
     };
     fetchUser();
-  }, []);
+  }, [supabase]);
 
   if (!uuid) return <div>Loading...</div>;
 

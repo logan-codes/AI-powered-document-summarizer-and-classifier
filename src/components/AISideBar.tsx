@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import client from "@/lib/supabase";
-import { askGemini } from "@/lib/gemini";
+import { createClient } from "@/lib/supabase";
 
 interface AISidebarProps {
   isOpen: boolean;
@@ -26,15 +25,16 @@ export default function AISidebar({
   editorApi,
 }: AISidebarProps) {
   const [messages, setMessages] = useState<
-    { role: "user" | "ai"; message: string }[]
+    { role: "user" | "assistant"; message: string }[]
   >([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   // Load chat history
   useEffect(() => {
     const fetchMessages = async () => {
-      const { data, error } = await client
+      const { data, error } = await supabase
         .from("draft_chats")
         .select("role, message")
         .eq("draft_id", draftId)
@@ -44,42 +44,40 @@ export default function AISidebar({
         console.error("Error fetching messages:", error);
         return;
       }
-      setMessages(data as { role: "user" | "ai"; message: string }[]);
+      setMessages(data as { role: "user" | "assistant"; message: string }[]);
     };
 
     fetchMessages();
-  }, [draftId]);
+  }, [draftId, supabase]);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
     const userTyped = input.trim();
-    const context = selectedText?.trim() || "";
+    const chatContext = selectedText?.trim() || "";
 
-    // optimistic: show only what user typed
+    // Optimistically update UI
     setMessages((prev) => [...prev, { role: "user", message: userTyped }]);
     setInput("");
-
-    await client.from("draft_chats").insert({
-      draft_id: draftId,
-      user_id: userId,
-      role: "user",
-      message: userTyped,
-      context,
-    });
-
     setLoading(true);
+
     try {
-      const constructed = context ? `${userTyped}\n\nContext: \n${context}` : userTyped;
-      const reply = await askGemini(constructed, messages);
+      const currentPath = window.location.pathname;
+      const chatEndpoint = `${currentPath}/chat`;
 
-      setMessages((prev) => [...prev, { role: "ai", message: reply }]);
-
-      await client.from("draft_chats").insert({
-        draft_id: draftId,
-        user_id: userId,
-        role: "assistant",
-        message: reply,
+      const res = await fetch(chatEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: userTyped,
+          userId,
+          context: chatContext,
+        }),
       });
+
+      if (!res.ok) throw new Error("Failed to get AI response");
+      
+      const { reply } = await res.json();
+      setMessages((prev) => [...prev, { role: "assistant", message: reply }]);
 
     } catch (err) {
       console.error("AI error:", err);
@@ -123,7 +121,7 @@ export default function AISidebar({
               }`}
             >
               <div className="whitespace-pre-wrap text-sm">{msg.message}</div>
-              {msg.role === "ai" && (
+              {msg.role === "assistant" && (
                 <div className="mt-1 flex gap-2 text-xs">
                   <button
                     className="text-gray-600 hover:text-black"

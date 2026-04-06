@@ -1,11 +1,12 @@
 // lib/gemini.ts
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+
+// Use environment variable for model selection
+const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || "gemini-2.0-flash" });
 
 export async function askGemini(prompt: string, history: { role: string; message: string }[]) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-
   const chat = model.startChat({
     history: history.map(h => ({
       role: h.role === "assistant" ? "model" : "user",

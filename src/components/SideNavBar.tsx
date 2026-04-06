@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Home, Search, FileText, Settings, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 interface NavItem {
   label: string;
@@ -20,6 +20,7 @@ interface SideNavBarProps {
 
 export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarProps) {
   const router = useRouter();
+  const supabase = createClient();
 
   const navItems: NavItem[] = [
     { label: "Home", icon: <Home size={20} />, path: `/${uuid}` },
@@ -32,14 +33,14 @@ export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarPr
     const {
       data: { user },
       error: authError,
-    } = await client.auth.getUser();
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       router.push("/login");
       return;
     }
 
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from("drafts")
       .insert({
         user_id: user.id,

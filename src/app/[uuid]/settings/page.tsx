@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -16,11 +16,12 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
 
   const router = useRouter();
+  const supabase = createClient();
 
   // Fetch current user info
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user }, error } = await client.auth.getUser();
+      const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) {
         toast.error("Please login first");
         router.push("/login");
@@ -31,11 +32,11 @@ export default function SettingsPage() {
       }
     };
     fetchUser();
-  }, [router]);
+  }, [router, supabase]);
 
   // Update name in user profile
   const handleSave = async () => {
-    const { error } = await client.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       data: { name },
     });
 
@@ -49,7 +50,7 @@ export default function SettingsPage() {
   // Trigger password reset email
   const handlePasswordReset = async () => {
     try {
-      const { error } = await client.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
       if (error) throw error;
       toast.success("Password reset email sent!");
     } catch (err: unknown) {
@@ -63,7 +64,7 @@ export default function SettingsPage() {
 
   // Sign out
   const handleSignOut = async () => {
-    await client.auth.signOut();
+    await supabase.auth.signOut();
     toast("Logged out successfully!");
     router.push("/login");
   };

@@ -1,4 +1,6 @@
-import client from './supabase';
+import { createClient } from './supabase';
+
+const client = createClient();
 
 export const loginUser = async (email: string, password: string) => {
   const { data, error } = await client.auth.signInWithPassword({
@@ -13,26 +15,25 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const signUpUser = async (email: string, password: string, username: string) => {
-  // 1️⃣ Create the user in Supabase Auth
+  // Create the user in Supabase Auth.
+  // We pass 'username' in options.data so the DB trigger can extract it 
+  // from NEW.raw_user_meta_data.
   const { data: authData, error: authError } = await client.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        username: username,
+      },
+    },
   });
 
   if (authError) throw authError;
 
-  // 2️⃣ Insert the user's profile using their auth UUID
-  const { data: profileData, error: profileError } = await client
-    .from("profiles")
-    .upsert({
-      id: authData.user?.id,   // Auth UUID
-      username: username,
-      email: authData.user?.email,
-    });
+  // No need to manually insert into "profiles" anymore.
+  // The database trigger 'on_auth_user_created' handles this automatically.
 
-  if (profileError) throw profileError;
-
-  return { authData, profileData };
+  return { authData };
 };
 
 export const logoutUser = async () => {

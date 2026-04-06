@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import client from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export default function TopNavBar() {
   const pathname = usePathname();
   const router = useRouter();
+  const supabase = createClient();
 
   const handleLogout = async () => {
-    await client.auth.signOut();
+    await supabase.auth.signOut();
     router.push("/"); // Redirect after logout
   };
 
