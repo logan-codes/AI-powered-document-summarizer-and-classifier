@@ -4,7 +4,7 @@ import DashboardClient from "@/components/dashboard/DashboardClient";
 export default async function DashboardPage({ 
   params 
 }: { 
-  params: Promise<{ uuid: string }> | { uuid: string } 
+  params: Promise<{ uuid: string }>
 }) {
   const resolvedParams = await params;
   const { uuid } = resolvedParams;

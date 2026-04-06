@@ -8,7 +8,7 @@ export default async function UserLayout({
   params 
 }: { 
   children: React.ReactNode, 
-  params: Promise<{ uuid: string }> | { uuid: string } 
+  params: Promise<{ uuid: string }> 
 }) {
   // Await params if it's a promise (Next 15 standard)
   const resolvedParams = await params;
