@@ -88,8 +88,10 @@ export default function AISidebar({
 
   return (
     <div
-      className={`fixed right-0 flex flex-col border-l shadow-lg bg-gray-100 transition-all duration-300 ${
-        isOpen ? "" : "w-12"
+      className={`fixed right-0 flex flex-col transition-all duration-300 z-40 ${
+        isOpen 
+          ? "border-l shadow-2xl bg-gray-100 max-lg:!w-[300px] max-lg:max-w-[85vw]" 
+          : "w-12 max-lg:!bg-transparent max-lg:shadow-none max-lg:border-0 border-l shadow-lg bg-gray-100"
       }`}
       style={{
         top: `${topBarHeight}px`,

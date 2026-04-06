@@ -1,43 +1,35 @@
-"use client";
+import { redirect } from "next/navigation";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
+import StoreInitializer from "@/components/StoreInitializer";
+import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
 
-import SideNavBar from "@/components/SideNavBar";
-import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase";
+export default async function UserLayout({ 
+  children, 
+  params 
+}: { 
+  children: React.ReactNode, 
+  params: Promise<{ uuid: string }> | { uuid: string } 
+}) {
+  // Await params if it's a promise (Next 15 standard)
+  const resolvedParams = await params;
+  
+  const supabase = await createServerSupabaseClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
-  const [expanded, setExpanded] = useState(false);
-  const [uuid, setUuid] = useState<string | null>(null);
-  const supabase = createClient();
+  if (!user || error) {
+    redirect("/login");
+  }
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (!user || error) {
-        window.location.href = "/login";
-      } else {
-        setUuid(user.id);
-      }
-    };
-    fetchUser();
-  }, [supabase]);
-
-  if (!uuid) return <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">Loading dashboard...</div>;
+  if (user.id !== resolvedParams.uuid) {
+    redirect(`/${user.id}`);
+  }
 
   return (
-    <div className="flex flex-1">
-      {/* Side Navbar */}
-      <SideNavBar expanded={expanded} setExpanded={setExpanded} uuid={uuid} />
-
-      {/* Content area */}
-      <div
-        className="flex-1 overflow-y-auto transition-all duration-300"
-        style={{ 
-          marginLeft: expanded ? 240 : 64,
-          height: `calc(100vh - 64px)`,
-        }}
-      >
+    <>
+      <StoreInitializer uuid={user.id} />
+      <ClientLayoutWrapper>
         {children}
-      </div>
-    </div>
+      </ClientLayoutWrapper>
+    </>
   );
 }

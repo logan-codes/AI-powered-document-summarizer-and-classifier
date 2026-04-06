@@ -6,19 +6,16 @@ import { Home, Search, FileText, Settings, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
+import { useAppStore } from "@/store/useAppStore";
+
 interface NavItem {
   label: string;
   icon: React.ReactNode;
   path?: string;
 }
 
-interface SideNavBarProps {
-  expanded: boolean;
-  setExpanded: (val: boolean) => void;
-  uuid: string; // ✅ pass uuid here
-}
-
-export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarProps) {
+export default function SideNavBar() {
+  const { isSidebarExpanded, setSidebarExpanded, isMobileMenuOpen, uuid } = useAppStore();
   const router = useRouter();
   const supabase = createClient();
 
@@ -60,13 +57,15 @@ export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarPr
 
   return (
     <div
-      className="fixed left-0 flex flex-col justify-between bg-[#f7f9fc] border-r transition-all duration-300 group z-40"
-      onMouseEnter={() => setExpanded(true)}
-      onMouseLeave={() => setExpanded(false)}
+      className={`fixed left-0 flex flex-col justify-between bg-[#f7f9fc] border-r transition-transform duration-300 group z-40 ${
+        isMobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"
+      }`}
+      onMouseEnter={() => setSidebarExpanded(true)}
+      onMouseLeave={() => setSidebarExpanded(false)}
       style={{
         top: "64px",
         height: "calc(100vh - 64px)",
-        width: expanded ? "240px" : "64px",
+        width: isSidebarExpanded || isMobileMenuOpen ? "240px" : "64px",
       }}
     >
       {/* Top Section */}
@@ -76,11 +75,11 @@ export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarPr
             key={index}
             onClick={() => item.path && router.push(item.path)}
             className={`flex items-center cursor-pointer gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
-              expanded ? "justify-start" : "justify-center"
+              isSidebarExpanded || isMobileMenuOpen ? "justify-start" : "justify-center"
             }`}
           >
             <span className="text-gray-700">{item.icon}</span>
-            {expanded && (
+            {(isSidebarExpanded || isMobileMenuOpen) && (
               <span className="text-sm font-medium text-[#0c141c]">
                 {item.label}
               </span>
@@ -94,11 +93,11 @@ export default function SideNavBar({ expanded, setExpanded, uuid }: SideNavBarPr
         <Button
           onClick={handleNewDraft}
           className={`bg-[#197fe5] hover:bg-blue-700 text-white w-full justify-center ${
-            !expanded ? "px-0" : ""
+            !(isSidebarExpanded || isMobileMenuOpen) ? "px-0" : ""
           }`}
         >
-          <Plus size={18} className={!expanded ? "" : "mr-2"} />
-          {expanded && "New Case"}
+          <Plus size={18} className={!(isSidebarExpanded || isMobileMenuOpen) ? "" : "mr-2"} />
+          {(isSidebarExpanded || isMobileMenuOpen) && "New Case"}
         </Button>
       </div>
     </div>

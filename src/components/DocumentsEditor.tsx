@@ -211,9 +211,9 @@ const DocumentsEditor: React.FC<DocumentsEditorProps> = ({
         <Button variant="ghost" size="icon" title="Clear Formatting" onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}><Eraser /></Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-        <div id="editor-page-container" className="relative mx-auto bg-white shadow border" style={{ width: '794px', minHeight: '1123px' }}>
-          <div className="p-8">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50">
+        <div id="editor-page-container" className="relative mx-auto bg-white shadow border w-full max-w-4xl min-h-[800px]">
+          <div className="p-4 sm:p-8">
             <EditorContent editor={editor} />
           </div>
           {showSelectionTip && selectionPos && (

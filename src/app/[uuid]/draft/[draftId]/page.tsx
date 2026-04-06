@@ -46,7 +46,8 @@ export default function DraftPage() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <div className="flex-1 h-full"
+      <div 
+        className="flex-1 h-full max-lg:!mr-0 max-lg:!min-w-0 transition-all duration-300"
         style={{
             marginRight: aiOpen ? sidebarWidth : 48, 
             height: `calc(100vh - 64px)`,
@@ -61,7 +62,7 @@ export default function DraftPage() {
       {/* Drag handle */}
       {aiOpen && (
         <div
-          className="z-20 fixed top-[64px] h-[calc(100vh-64px)] w-1 cursor-col-resize"
+          className="z-20 fixed top-[64px] h-[calc(100vh-64px)] w-1 cursor-col-resize hidden lg:block"
           style={{ right: sidebarWidth }}
           onMouseDown={(e) => {
             e.preventDefault();
