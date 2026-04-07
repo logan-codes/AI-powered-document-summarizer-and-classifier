@@ -10,9 +10,9 @@ const features = [
   },
   {
     id: 2,
-    title: "Case Resource",
+    title: "Template Resource",
     description:
-      "Access a library of resources, including articles, webinars, and tutorials, to enhance your legal knowledge.",
+      "Access a library of templates to quickly generate legal documents.",
     icon: Library,
   },
   {
