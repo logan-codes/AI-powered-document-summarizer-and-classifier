@@ -3,27 +3,20 @@ import { Search, FileText, Library, LayoutDashboard } from "lucide-react";
 const features = [
   {
     id: 1,
-    title: "Case Research",
-    description:
-      "Search and analyze millions of legal cases with advanced filtering and sorting options.",
-    icon: Search,
-  },
-  {
-    id: 2,
     title: "Document Summarization",
     description:
       "Quickly summarize lengthy legal documents and extract key information for efficient review.",
     icon: FileText,
   },
   {
-    id: 3,
+    id: 2,
     title: "Case Resource",
     description:
       "Access a library of resources, including articles, webinars, and tutorials, to enhance your legal knowledge.",
     icon: Library,
   },
   {
-    id: 4,
+    id: 3,
     title: "Case Workspace",
     description:
       "Manage your cases, documents, and research in a centralized workspace for better organization and collaboration.",
